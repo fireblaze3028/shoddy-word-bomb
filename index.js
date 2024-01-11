@@ -120,7 +120,7 @@ client.on('interactionCreate', async interaction => {
 
     try {
         // scuffed way to pass stuff to only set-channel, needed to create a new instance
-        if (interaction.commandName == "set-channel") {
+        if (command.needsWordData) {
             await command.execute(interaction, client, words, templates, templateSolves);
         }
         else {

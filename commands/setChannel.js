@@ -13,6 +13,7 @@ module.exports = {
                 .setRequired(true)
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+    needsWordData: true,
     async execute(interaction, client, words, templates, templateSolves) {
         var newChannelID = interaction.options.getChannel("channel").id;
         var oldchannelID = database.getChannelFromServer(interaction.guild.id);
