@@ -1,4 +1,4 @@
 config.json
 files/channels.txt
-stats/
+stats/*
 !stats/exampleChannelID.txt
