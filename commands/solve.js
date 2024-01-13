@@ -9,6 +9,21 @@ module.exports = {
         .setName("regex")
         .setDescription("The regex to filter words")
         .setRequired(true))
+    .addStringOption(option => 
+        option
+        .setName("sort")
+        .setDescription("How to sort the data")
+        .addChoices(
+            { name: 'Length', value: 'length' },
+            { name: 'Alphabetical', value: 'alphabetical' }
+        )
+    )
+    .addBooleanOption(option =>
+        option
+        .setName("reverse")
+        .setDescription("Reverses the order to sort the results")
+        .setRequired(false)
+    )
     .addBooleanOption(option => 
         option
         .setName("ephemeral")
@@ -18,19 +33,37 @@ module.exports = {
     .setDMPermission(true),
     needsWordData: true,
     async execute(interaction, client, words, templates, templateSolves) {
+        // the final string we will use to send the message
         var finalString = '';
+        // whether to make the message visible to everyone or not, by default it isnt
+        var ephemeral = (interaction.options.getBoolean("ephemeral") === null) ? true : interaction.options.getBoolean("ephemeral");
         try {
+            // all of our matching words
             var matchingWords = [];
             for (var i = 0; i < words.length; i++) {
-                if (words[i].match(new RegExp(interaction.options.getString("regex")))) {
-                    matchingWords.push(words[i]);
+                // see if the query returns anything, then add to list
+                var query = words[i].match(new RegExp(interaction.options.getString("regex")));
+                if (query) {
+                    boldedWord = words[i].substring(0, query.index) + "**" + words[i].substring(query.index, query.index + query[0].length) + "**" + words[i].substring(query.index + query[0].length, words[i].length + 1);
+                    matchingWords.push(boldedWord);
                 }
             }
-            interaction.reply({ content: `Your regex has ${matchingWords.length} solves`, ephemeral: interaction.options.getBoolean("ephemeral")});
+            // sort by length if user wants to
+            if (interaction.options.getString("sort") == "length") {
+                matchingWords.sort((a, b) => a.length - b.length);
+            }
+            if (interaction.options.getBoolean("reverse")) {
+                matchingWords.reverse();
+            }
+            finalString += `Your regex has ${matchingWords.length} solutions\n`;
+            for (var i = 0; i < Math.min(5, matchingWords.length + 1); i++) {
+                finalString += `\n${matchingWords.shift()}`;
+            }
+            interaction.reply({ content: finalString, ephemeral: ephemeral});
         }
         catch (e) {
             console.log(e);
-            interaction.reply({ content: "Your regex gave an error. Please try again.", ephemeral: interaction.options.getBoolean("ephemeral")});
+            interaction.reply({ content: "Your regex gave an error. Please try again.", ephemeral: ephemeral});
         }
     }
 }
