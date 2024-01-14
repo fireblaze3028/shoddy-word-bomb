@@ -31,6 +31,9 @@ module.exports = {
         // if the prompt mode is hard mode
         var hardMode = false;
 
+        // people who use /solve and then solve the prompt
+        var solveUsers = [];
+
         // checking if we have perms to view + send messages
         var perms = channel.guild.members.me?.permissionsIn(channel.id);
         if (!perms.has(PermissionFlagsBits.ViewChannel) || !perms.has(PermissionFlagsBits.SendMessages)) {
@@ -62,30 +65,46 @@ module.exports = {
             if (checkPrompt(m.content.trim().toLowerCase(), m)) {
                 timeSolved = Date.now();
                 solveOwners.push(m.author.id);
-                var exact = checkExact(m);
-                updateStreak(m);
-                database.updateUser(channel.id, streakOwner.id, exact, timeSolved - timeSent, currentStreak);
+                console.log("hi");
+                if (!solveUsers.includes(m.author.id)) {
+                    var exact = checkExact(m);
+                    updateStreak(m);
+                    database.updateUser(channel.id, streakOwner.id, exact, timeSolved - timeSent, currentStreak);
+                }
+                else {
+                    mContent[4] = `\n**${m.author.username}** used the solver this round.`;
+                }
+
                 m.reply(stitchMessage(mContent.flat())).then((message) => {
                     currentMessage = message;
                 })
+                // set our timeout so no one else can solve this prompt
                 setTimeout(() => {
                     if (solveOwners.length > 1) {
                         currentMessage.edit(stitchMessage(mContent.flat()))
                     }
                 }, 1000);
+                // start the loop again after three seconds
                 setTimeout(() => {
                     mContent = [];
                     mContent[1] = [];
                     solveOwners = [];
+                    solveUsers = [];
                     currentMessage = undefined;
                     mainGameLoop()
                 }, 3000)
             }
         });
 
+        // toggle hard mode once given signal
         client.on(`${channel.id}-hard`, (i) => {
             hardMode = !hardMode;
             i.reply(`Hard mode ${hardMode ? "enabled in this channel." : "disabled in this channel."}`);
+        });
+
+        // add people who use /solve to a list
+        client.on(`${channel.id}-solve`, (id) => {
+            solveUsers.push(id);
         });
 
         function mainGameLoop() {

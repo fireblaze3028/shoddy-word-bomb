@@ -16,9 +16,8 @@ module.exports = {
         .setDMPermission(false),
     
     async execute(interaction, client) {
-        var user;
-        console.log(interaction.options.getUser('target'));
-        user = interaction.user;
+        // get the stats of the target user
+        var user = interaction.user;
         if (interaction.options.getUser('target')) {
             user = interaction.options.getUser('target');
         }

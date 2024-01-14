@@ -7,6 +7,8 @@ module.exports = {
         .setDescription("Toggles harder prompts in this server.")
         .setDMPermission(false),
     async execute(interaction, client) {
+        // get channel being used to play from server id
+        // then call the instance of the game to toggle hard mode
         var correctChannel = database.getChannelFromServer(interaction.guild.id);
         if (correctChannel == undefined) {
             interaction.reply({ content: "You must set the channel to enable this.", ephemeral: true });

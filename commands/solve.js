@@ -1,3 +1,4 @@
+const database = require('../utility/database.js');
 const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
@@ -56,10 +57,14 @@ module.exports = {
                 matchingWords.reverse();
             }
             finalString += `Your regex has ${matchingWords.length} solutions\n`;
-            for (var i = 0; i < Math.min(5, matchingWords.length + 1); i++) {
-                finalString += `\n${matchingWords.shift()}`;
+            // if there are words to show, for loop shows a word if there are no solutions
+            if (matchingWords.length != 0) {
+                for (var i = 0; i < Math.min(5, matchingWords.length + 1); i++) {
+                    finalString += `\n${matchingWords.shift()}`;
+                }
             }
             interaction.reply({ content: finalString, ephemeral: ephemeral});
+            client.emit(`${database.getChannelFromServer(interaction.guild.id)}-solve`, interaction.user.id);
         }
         catch (e) {
             console.log(e);

@@ -18,6 +18,7 @@ module.exports = {
     ),
     needsWordData: true,
     async execute(interaction, client, words, templates, templateSolves) {
+        // set our message to not include unless the word is found in dictionary, then change
         var message = `:red_square: "${interaction.options.getString("word")}" is not a valid word.`;
         for (var word of words) {
             if (word == interaction.options.getString("word")) {

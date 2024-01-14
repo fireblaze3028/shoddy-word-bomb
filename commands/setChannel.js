@@ -15,9 +15,11 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     needsWordData: true,
     async execute(interaction, client, words, templates, templateSolves) {
+        // channel ids
         var newChannelID = interaction.options.getChannel("channel").id;
         var oldchannelID = database.getChannelFromServer(interaction.guild.id);
 
+        // checks if it is able to switch
         var perms = interaction.guild.members.me?.permissionsIn(newChannelID);
         if (newChannelID == oldchannelID) {
             await interaction.reply({content: "Cannot change to the same channel!", ephemeral: true});
@@ -28,13 +30,14 @@ module.exports = {
             return;
         }
         if (oldchannelID != undefined) {
-            // set the channel and stuf
+            // set the channel if its new
             client.removeAllListeners(oldchannelID);
         }
-        // change the channel and stuf
+        // change the channel 
         database.switchChannels(oldchannelID, newChannelID, interaction.guild.id);
         wbm.execute(client, client.channels.cache.get(newChannelID), words, templates, templateSolves);
 
+        // reply so users knows
         await interaction.reply({content: `Successfully set channel to <#${newChannelID}>.`, ephemeral: true});
     }
 }
