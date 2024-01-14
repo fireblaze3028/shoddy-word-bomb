@@ -54,8 +54,8 @@ module.exports = {
             }
 
             if (solveOwners.length != 0) {
-                if (checkPrompt(m.content.trim().toLowerCase(), m) && (Date.now() - timeSolved) <= 1000 && !solveOwners.includes(m.author.id)) {
-                    mContent[1].push("\n" + m.author.username + " was **" + (Date.now() - timeSolved) + "** ms late...");
+                if (checkPrompt(m.content.trim().toLowerCase(), m) && (m.createdTimestamp - timeSolved) <= 1000 && !solveOwners.includes(m.author.id)) {
+                    mContent[1].push("\n" + m.author.username + " was **" + (m.createdTimestamp - timeSolved) + "** ms late...");
                     solveOwners.push(m.author.id);
                 }
                 return;
@@ -63,9 +63,9 @@ module.exports = {
             mContent[0] = "Solved by " + m.author.username + ", created from the word \"" + currentWord + "\"";
 
             if (checkPrompt(m.content.trim().toLowerCase(), m)) {
-                timeSolved = Date.now();
+                timeSolved = m.createdTimestamp;
                 solveOwners.push(m.author.id);
-                console.log("hi");
+                console.log(timeSolved - timeSent);
                 if (!solveUsers.includes(m.author.id)) {
                     var exact = checkExact(m);
                     updateStreak(m);
@@ -119,8 +119,8 @@ module.exports = {
             if (matchLength) {
                 mainm += "\n\nMust be " + (currentWord.length) + " characters long!";
             }
-            channel.send(mainm).then(() => {
-                timeSent = Date.now();
+            channel.send(mainm).then((message) => {
+                timeSent = message.createdTimestamp;
             })
         
         }
