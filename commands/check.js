@@ -24,7 +24,7 @@ module.exports = {
         // set our message to not include unless the word is found in dictionary, then change
         var message = `:red_square: "${interaction.options.getString("word")}" is not a valid word.`;
         for (var word of words) {
-            if (word == interaction.options.getString("word")) {
+            if (word == interaction.options.getString("word").toLowerCase()) {
                 message = `:green_square: "${word}" is a valid word.`;
                 break;
             }
