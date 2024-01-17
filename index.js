@@ -134,6 +134,7 @@ client.on('interactionCreate', async interaction => {
 
 client.once('ready', client => {
     for (var channelID of channels) {
+        if (channelID.startsWith("//")) continue; // dont start commented out channels
         var channel = client.channels.cache.get(channelID);
         wbm.execute(client, channel, words, templates, templateSolves);
     }
