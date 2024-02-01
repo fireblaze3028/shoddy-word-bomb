@@ -78,6 +78,7 @@ module.exports = {
                 m.reply(stitchMessage(mContent.flat())).then((message) => {
                     currentMessage = message;
                 })
+                .catch("error sending message");
                 // set our timeout so no one else can solve this prompt
                 setTimeout(() => {
                     if (solveOwners.length > 1) {
@@ -99,7 +100,8 @@ module.exports = {
         // toggle hard mode once given signal
         client.on(`${channel.id}-hard`, (i) => {
             hardMode = !hardMode;
-            i.reply(`Hard mode ${hardMode ? "enabled in this channel." : "disabled in this channel."}`);
+            i.reply(`Hard mode ${hardMode ? "enabled in this channel." : "disabled in this channel."}`)
+            .catch("error sending message");
         });
 
         // add people who use /solve to a list
@@ -202,13 +204,15 @@ module.exports = {
                             if (word == words[k]) {
         
                                 // if the length has to match
-                                if (matchLength) {
+                                if (matchLength && solveOwners.length == 0) {
                                     if (word.length < currentWord.length) {
-                                        m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go higher")
+                                        m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go higher :arrow_up:")
+                                        .catch("error sending message");
                                         return false;
                                     }
                                     if (word.length > currentWord.length) {
-                                        m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go lower")
+                                        m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go lower :arrow_down:")
+                                        .catch("error sending message");
                                         return false;
                                     }
                                 }

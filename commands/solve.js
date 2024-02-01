@@ -37,7 +37,7 @@ module.exports = {
         // the final string we will use to send the message
         var finalString = '';
         // whether to make the message visible to everyone or not, by default it isnt
-        var ephemeral = (interaction.options.getBoolean("ephemeral") === null) ? true : interaction.options.getBoolean("ephemeral");
+        var ephemeral = interaction.options.getBoolean("ephemeral");
         try {
             // all of our matching words
             var matchingWords = [];
@@ -63,12 +63,14 @@ module.exports = {
                     finalString += `\n${matchingWords.shift()}`;
                 }
             }
-            interaction.reply({ content: finalString, ephemeral: ephemeral});
+            interaction.reply({ content: finalString, ephemeral: ephemeral})
+            .catch("error sending message");
             client.emit(`${database.getChannelFromServer(interaction.guild.id)}-solve`, interaction.user.id);
         }
         catch (e) {
             console.log(e);
-            interaction.reply({ content: "Your regex gave an error. Please try again.", ephemeral: ephemeral});
+            interaction.reply({ content: "Your regex gave an error. Please try again.", ephemeral: ephemeral})
+            .catch("error sending message");
         }
     }
 }

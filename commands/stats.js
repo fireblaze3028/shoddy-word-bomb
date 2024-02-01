@@ -25,7 +25,8 @@ module.exports = {
 
         // checking if time is undefined, then no solves have occured
         if (content.time == undefined) {
-            await interaction.reply({ embeds: [getErrorEmbed()], ephemeral: interaction.options.getBoolean('ephemeral') });
+            await interaction.reply({ embeds: [getErrorEmbed()], ephemeral: interaction.options.getBoolean('ephemeral') })
+            .catch("error sending message");
             return;
         }
 
@@ -40,7 +41,8 @@ module.exports = {
         { name: `Largest streak: `, value: `${content.streak}` });
 
         // reply with just the embed and the option for the message to be ephemeral
-        await interaction.reply({embeds: [embed], ephemeral: interaction.options.getBoolean('ephemeral')});
+        await interaction.reply({embeds: [embed], ephemeral: interaction.options.getBoolean('ephemeral')})
+        .catch("error sending message");
 
         // create and return our error embed
         function getErrorEmbed() {

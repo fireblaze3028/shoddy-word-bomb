@@ -71,7 +71,7 @@ module.exports = {
             var curr = sorted.shift();
             content += `<@${curr.user}>: ${curr.val} ${suffixes.get(sort)}\n\n`;
         }
-        for (var i = 3; sorted.length != 0; i++) {
+        for (var i = 4; sorted.length != 0; i++) {
             var curr = sorted.shift();
             content += `${i}: <@${curr.user}>: ${curr.val} ${suffixes.get(sort)}\n`;
         }
@@ -79,7 +79,8 @@ module.exports = {
 
         embed.setDescription(content);
 
-        interaction.reply({ embeds: [embed], ephemeral: interaction.options.getBoolean('ephemeral') });
+        interaction.reply({ embeds: [embed], ephemeral: interaction.options.getBoolean('ephemeral') })
+        .catch("error sending message");
         // create and return our error embed
         function getErrorEmbed() {
             const embed = new EmbedBuilder()

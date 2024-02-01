@@ -5,6 +5,7 @@ module.exports = {
         .setName("ping")
         .setDescription("pong"),
     async execute(interaction, client) {
-        await interaction.reply("pong");
+        await interaction.reply("pong")
+        .catch("error sending message");
     }
 }

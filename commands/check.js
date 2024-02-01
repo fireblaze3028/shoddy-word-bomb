@@ -29,6 +29,7 @@ module.exports = {
                 break;
             }
         }
-        interaction.reply({ content: message, ephemeral: ephemeral});
+        interaction.reply({ content: message, ephemeral: ephemeral})
+        .catch("error sending message");
     }
 }
