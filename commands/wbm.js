@@ -66,6 +66,9 @@ module.exports = {
                 timeSolved = m.createdTimestamp;
                 solveOwners.push(m.author.id);
                 console.log(timeSolved - timeSent);
+                if (timeSolved - timeSent < 1000) {
+                    mContent[5] = "**" + m.author.username + " solved in " + (timeSolved - timeSent) + " ms!**";
+                }
                 if (!solveUsers.includes(m.author.id)) {
                     var exact = checkExact(m);
                     updateStreak(m);
