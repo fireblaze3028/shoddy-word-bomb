@@ -34,7 +34,12 @@ module.exports = {
         // get channel and see if there are people in the leaderboard
         var channel = database.getChannel(database.getChannelFromServer(interaction.guild.id));
         if (channel.size == 0) {
-            interaction.reply({ embeds: [getErrorEmbed()], ephemeral: interaction.options.getBoolean("ephemeral") });
+            try {
+                interaction.reply({ embeds: [getErrorEmbed()], ephemeral: interaction.options.getBoolean("ephemeral") });
+            }
+            catch (error) {
+                console.log("error sending message");
+            }
         }
         var sort = interaction.options.getString("sort");
         if (!sort) {
@@ -79,8 +84,12 @@ module.exports = {
 
         embed.setDescription(content);
 
-        interaction.reply({ embeds: [embed], ephemeral: interaction.options.getBoolean('ephemeral') })
-        .catch("error sending message");
+        try {
+            interaction.reply({ embeds: [embed], ephemeral: interaction.options.getBoolean('ephemeral') })
+        }
+        catch (error) {
+            console.log("error sending message");
+        }
         // create and return our error embed
         function getErrorEmbed() {
             const embed = new EmbedBuilder()

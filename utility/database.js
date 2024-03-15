@@ -12,7 +12,13 @@ module.exports = {
         if (time < userStats.time || userStats.time == undefined) { userStats.time = time; }
         if (streak > userStats.streak) { userStats.streak = streak; }
 
-        fs.writeFileSync('./stats/' + channelID + '.txt', JSON.stringify(Array.from(channelStats.entries())));
+        try {
+            fs.writeFileSync('./stats/' + channelID + '.txt', JSON.stringify(Array.from(channelStats.entries())));
+        } catch (error) {
+            let string = `${channelID}:\n${JSON.stringify(Array.from(channelStats.entries()))}`; // in case writing to file fails
+            console.log(error);
+            console.log(string);
+        }
     },
     getUser(channelID, userID) {
         var channelStats = this.getChannel(channelID);

@@ -78,10 +78,14 @@ module.exports = {
                     mContent[4] = `\n**${m.author.username}** used the solver this round.`;
                 }
 
-                m.reply(stitchMessage(mContent.flat())).then((message) => {
-                    currentMessage = message;
-                })
-                .catch("error sending message");
+                try {
+                    m.reply(stitchMessage(mContent.flat())).then((message) => {
+                        currentMessage = message;
+                    })
+                }
+                catch (error) {
+                    console.log("error sending message");
+                }
                 // set our timeout so no one else can solve this prompt
                 setTimeout(() => {
                     if (solveOwners.length > 1) {
@@ -103,8 +107,12 @@ module.exports = {
         // toggle hard mode once given signal
         client.on(`${channel.id}-hard`, (i) => {
             hardMode = !hardMode;
-            i.reply(`Hard mode ${hardMode ? "enabled in this channel." : "disabled in this channel."}`)
-            .catch("error sending message");
+            try {
+                i.reply(`Hard mode ${hardMode ? "enabled in this channel." : "disabled in this channel."}`)
+            }
+            catch (error) {
+                console.log("error sending message");
+            }
         });
 
         // add people who use /solve to a list
@@ -124,10 +132,14 @@ module.exports = {
             if (matchLength) {
                 mainm += "\n\nMust be " + (currentWord.length) + " characters long!";
             }
-            channel.send(mainm).then((message) => {
-                timeSent = message.createdTimestamp;
+            try {
+                channel.send(mainm).then((message) => {
+                    timeSent = message.createdTimestamp;
             })
-        
+            }
+            catch (error) {
+                console.log("error sending message");
+            }
         }
 
         function createPrompt() {
@@ -209,13 +221,21 @@ module.exports = {
                                 // if the length has to match
                                 if (matchLength && solveOwners.length == 0) {
                                     if (word.length < currentWord.length) {
-                                        m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go higher :arrow_up:")
-                                        .catch("error sending message");
+                                        try {
+                                            m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go higher :arrow_up:")
+                                        }
+                                        catch (error) {
+                                            console.log("error sending message");
+                                        }
                                         return false;
                                     }
                                     if (word.length > currentWord.length) {
-                                        m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go lower :arrow_down:")
-                                        .catch("error sending message");
+                                        try {
+                                            m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go lower :arrow_down:")
+                                        }
+                                        catch (error) {
+                                            console.log("error sending message");
+                                        }
                                         return false;
                                     }
                                 }

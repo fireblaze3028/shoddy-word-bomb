@@ -22,13 +22,21 @@ module.exports = {
         // checks if it is able to switch
         var perms = interaction.guild.members.me?.permissionsIn(newChannelID);
         if (newChannelID == oldchannelID) {
-            await interaction.reply({content: "Cannot change to the same channel!", ephemeral: true})
-            .catch("error sending message");
+            try {
+                await interaction.reply({content: "Cannot change to the same channel!", ephemeral: true})
+            }
+            catch (error) {
+                console.log("error sending message");
+            }
             return;
         }
         else if (!perms.has(PermissionFlagsBits.ViewChannel) || !perms.has(PermissionFlagsBits.SendMessages)) {
-            await interaction.reply({content: `The bot does not have access or cannot send messages to <#${newChannelID}>.`, ephemeral: true})
-            .catch("error sending message");
+            try {
+                await interaction.reply({content: `The bot does not have access or cannot send messages to <#${newChannelID}>.`, ephemeral: true})
+            }
+            catch (error) {
+                console.log("error sending message");
+            }
             return;
         }
         if (oldchannelID != undefined) {
@@ -40,7 +48,11 @@ module.exports = {
         wbm.execute(client, client.channels.cache.get(newChannelID), words, templates, templateSolves);
 
         // reply so users knows
-        await interaction.reply({content: `Successfully set channel to <#${newChannelID}>.`, ephemeral: true})
-        .catch("error sending message");
+        try {
+            await interaction.reply({content: `Successfully set channel to <#${newChannelID}>.`, ephemeral: true})
+        }
+        catch (error) {
+            console.log("error sending message");
+        }
     }
 }

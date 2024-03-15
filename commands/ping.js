@@ -5,7 +5,11 @@ module.exports = {
         .setName("ping")
         .setDescription("pong"),
     async execute(interaction, client) {
+        try {
         await interaction.reply("pong")
-        .catch("error sending message");
+        }
+        catch (error) {
+            console.log("error sending message");
+        }
     }
 }

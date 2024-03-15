@@ -63,14 +63,22 @@ module.exports = {
                     finalString += `\n${matchingWords.shift()}`;
                 }
             }
-            interaction.reply({ content: finalString, ephemeral: ephemeral})
-            .catch("error sending message");
+            try {
+                interaction.reply({ content: finalString, ephemeral: ephemeral})
+            }
+            catch (error) {
+                console.log("error sending message");
+            }
             client.emit(`${database.getChannelFromServer(interaction.guild.id)}-solve`, interaction.user.id);
         }
         catch (e) {
             console.log(e);
-            interaction.reply({ content: "Your regex gave an error. Please try again.", ephemeral: ephemeral})
-            .catch("error sending message");
+            try {
+                interaction.reply({ content: "Your regex gave an error. Please try again.", ephemeral: ephemeral})
+            }
+            catch (error) {
+                console.log("error sending message");
+            }
         }
     }
 }
