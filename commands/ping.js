@@ -6,7 +6,7 @@ module.exports = {
         .setDescription("pong"),
     async execute(interaction, client) {
         try {
-        await interaction.reply("pong")
+            await interaction.reply("pong")
         }
         catch (error) {
             console.log("error sending message");

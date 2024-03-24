@@ -34,11 +34,11 @@ module.exports = {
     .setDMPermission(true),
     needsWordData: true,
     async execute(interaction, client, words, templates, templateSolves) {
-        // the final string we will use to send the message
-        var finalString = '';
-        // whether to make the message visible to everyone or not, by default it isnt
-        var ephemeral = interaction.options.getBoolean("ephemeral");
         try {
+            // the final string we will use to send the message
+            var finalString = '';
+            // whether to make the message visible to everyone or not, by default it isnt
+            var ephemeral = interaction.options.getBoolean("ephemeral");
             // all of our matching words
             var matchingWords = [];
             for (var i = 0; i < words.length; i++) {
@@ -59,16 +59,12 @@ module.exports = {
             finalString += `Your regex has ${matchingWords.length} solutions\n`;
             // if there are words to show, for loop shows a word if there are no solutions
             if (matchingWords.length != 0) {
-                for (var i = 0; i < Math.min(5, matchingWords.length + 1); i++) {
-                    finalString += `\n${matchingWords.shift()}`;
+                for (var i = 0; i < 5; i++) {
+                    const word = matchingWords.shift();
+                    finalString += `${word === undefined ? "" : `\n${word}`}`;
                 }
             }
-            try {
-                interaction.reply({ content: finalString, ephemeral: ephemeral})
-            }
-            catch (error) {
-                console.log("error sending message");
-            }
+            interaction.reply({ content: finalString, ephemeral: ephemeral})
             client.emit(`${database.getChannelFromServer(interaction.guild.id)}-solve`, interaction.user.id);
         }
         catch (e) {

@@ -55,7 +55,7 @@ module.exports = {
 
             if (solveOwners.length != 0) {
                 if (checkPrompt(m.content.trim().toLowerCase(), m) && (m.createdTimestamp - timeSolved) <= 1000 && !solveOwners.includes(m.author.id)) {
-                    mContent[1].push("\n" + m.author.username + " was **" + (m.createdTimestamp - timeSolved) + "** ms late...");
+                    mContent[1].push("\n" + m.author.username + " was **" + (m.createdTimestamp - timeSolved) + "**ms late" + ((m.createdTimestamp - timeSolve) > 0 ? "..." : " get ping diffed lmao"));
                     solveOwners.push(m.author.id);
                 }
                 return;

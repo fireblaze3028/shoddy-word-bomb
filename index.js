@@ -5,7 +5,7 @@ const fs = require('fs');
 
 const wbm = require("./commands/wbm");
 
-const { token, clientId } = require('./config.json');
+const { token, clientId, authorId } = require('./config.json');
 
 // create our client with intents
 const client = new Client({
@@ -84,7 +84,7 @@ for (const file of commandFiles) {
         commands.push(command.data.toJSON());
     }
     else {
-        console.log("balls.");
+        console.log(file + " is not a command, skipping");
     }
 }
 
@@ -119,7 +119,6 @@ client.on('interactionCreate', async interaction => {
     }
 
     try {
-        // scuffed way to pass stuff to only set-channel, needed to create a new instance
         if (command.needsWordData) {
             await command.execute(interaction, client, words, templates, templateSolves);
         }
@@ -147,6 +146,18 @@ function stripEnd(value, index, array) {
 client.on('messageCreate', (message) => {
     if (message.author.bot) { return; }
     client.emit(message.channel.id, message);
+})
+
+client.on('warn', (message) => {
+    client.users.fetch(authorId, false).then((user) => {
+        user.send("```\n" + message + "\n```");
+    })
+})
+
+client.on('error', (message) => {
+    client.users.fetch(authorId, false).then((user) => {
+        user.send("```\n" + message + "\n```");
+    })
 })
 
 client.login(token);

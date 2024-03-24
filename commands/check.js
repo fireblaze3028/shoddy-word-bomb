@@ -19,6 +19,7 @@ module.exports = {
     ),
     needsWordData: true,
     async execute(interaction, client, words, templates, templateSolves) {
+        try {
         // whether to make the message visible to everyone or not, by default it isnt
         var ephemeral = (interaction.options.getBoolean("ephemeral") === null) ? true : interaction.options.getBoolean("ephemeral");
         // set our message to not include unless the word is found in dictionary, then change
@@ -30,6 +31,10 @@ module.exports = {
             }
         }
         interaction.reply({ content: message, ephemeral: ephemeral})
-        .catch("error sending message");
+        console.log("error sending message");
+        }
+        catch (e) {
+            console.log(e);
+        }
     }
 }
