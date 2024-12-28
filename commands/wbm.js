@@ -55,7 +55,7 @@ module.exports = {
 
             if (solveOwners.length != 0) {
                 if (checkPrompt(m.content.trim().toLowerCase(), m) && (m.createdTimestamp - timeSolved) <= 1000 && !solveOwners.includes(m.author.id)) {
-                    mContent[1].push("\n" + m.author.username + " was **" + (m.createdTimestamp - timeSolved) + "**ms late" + ((m.createdTimestamp - timeSolve) > 0 ? "..." : " get ping diffed lmao"));
+                    mContent[1].push("\n" + m.author.username + " was **" + (m.createdTimestamp - timeSolved) + "**ms late" + ((m.createdTimestamp - timeSolved) > 0 ? "..." : " get ping diffed lmao"));
                     solveOwners.push(m.author.id);
                 }
                 return;
@@ -66,8 +66,8 @@ module.exports = {
                 timeSolved = m.createdTimestamp;
                 solveOwners.push(m.author.id);
                 console.log(timeSolved - timeSent);
-                if (timeSolved - timeSent < 1000) {
-                    mContent[5] = "**" + m.author.username + " solved in " + (timeSolved - timeSent) + " ms!**";
+                if (timeSolved - timeSent < 1500) {
+                    mContent[5] = "\n**" + m.author.username + " solved in " + (timeSolved - timeSent) + " ms!**";
                 }
                 if (!solveUsers.includes(m.author.id)) {
                     var exact = checkExact(m);
@@ -119,6 +119,15 @@ module.exports = {
         client.on(`${channel.id}-solve`, (id) => {
             solveUsers.push(id);
         });
+
+        //resend prompt when given signal
+        client.on(`${channel.id}-prompt`, (i) => {
+            try {
+                i.reply(mainm);
+            } catch (error) {
+                console.log("error sending message");
+            }
+        })
 
         function mainGameLoop() {
             matchLength = true;
@@ -240,7 +249,10 @@ module.exports = {
                                     }
                                 }
         
-                                return true;
+                                // return true if the user doesn't have to match length or if the word lengths are equal
+                                // this is better than just returning true since it will only show late users if they
+                                // correctly solved it instead of just finding a correct word for a prompt with a specific amount of characters
+                                return (!matchLength) || word.length == currentWord.length;
                             }
                         }
                         return false;

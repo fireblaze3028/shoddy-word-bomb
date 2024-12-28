@@ -19,12 +19,12 @@ const client = new Client({
 
 // create our words variable to hold all words
 const words = fs.readFileSync('./files/dictionary.txt').toString().split("\n");
-words.forEach(stripEnd);
+//words.forEach(stripEnd);
 
 // read our dictionary to our variable
 
 const templates = fs.readFileSync('./files/templates.txt').toString().split("\n");
-templates.forEach(stripEnd);
+//templates.forEach(stripEnd);
 const templateSolves = new Array();
 for (var i = 0; i < templates.length; i++) {
     // every solve for this specific template

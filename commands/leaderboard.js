@@ -77,7 +77,7 @@ module.exports = {
                 var curr = sorted.shift();
                 content += `<@${curr.user}>: ${curr.val} ${suffixes.get(sort)}\n\n`;
             }
-            for (var i = 4; sorted.length != 0; i++) {
+            for (var i = 4; (i < 10) && sorted.length != 0; i++) {
                 var curr = sorted.shift();
                 content += `${i}: <@${curr.user}>: ${curr.val} ${suffixes.get(sort)}\n`;
             }
