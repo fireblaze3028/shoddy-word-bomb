@@ -63,9 +63,10 @@ module.exports = {
             mContent[0] = "Solved by " + m.author.username + ", created from the word \"" + currentWord + "\"";
 
             if (checkPrompt(m.content.trim().toLowerCase(), m)) {
+                console.log(templateSolves[13].get("ary"));
                 timeSolved = m.createdTimestamp;
                 solveOwners.push(m.author.id);
-                console.log(timeSolved - timeSent);
+                //console.log(timeSolved - timeSent);
                 if (timeSolved - timeSent < 1500) {
                     mContent[5] = "\n**" + m.author.username + " solved in " + (timeSolved - timeSent) + " ms!**";
                 }
@@ -224,38 +225,33 @@ module.exports = {
                     }
         
                     if (j == currentPrompt.length - 1) {
-                        for (var k = 0; k < words.length; k++) {
-                            if (word == words[k]) {
-        
-                                // if the length has to match
-                                if (matchLength && solveOwners.length == 0) {
-                                    if (word.length < currentWord.length) {
-                                        try {
-                                            m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go higher :arrow_up:")
-                                        }
-                                        catch (error) {
-                                            console.log("error sending message");
-                                        }
-                                        return false;
-                                    }
-                                    if (word.length > currentWord.length) {
-                                        try {
-                                            m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go lower :arrow_down:")
-                                        }
-                                        catch (error) {
-                                            console.log("error sending message");
-                                        }
-                                        return false;
-                                    }
+                        if (!binarySearchWord(word, 0, words.length)) return false;
+                        // if the length has to match
+                        if (matchLength && solveOwners.length == 0) {
+                            if (word.length < currentWord.length) {
+                                try {
+                                    m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go higher :arrow_up:")
                                 }
-        
-                                // return true if the user doesn't have to match length or if the word lengths are equal
-                                // this is better than just returning true since it will only show late users if they
-                                // correctly solved it instead of just finding a correct word for a prompt with a specific amount of characters
-                                return (!matchLength) || word.length == currentWord.length;
+                                catch (error) {
+                                    console.log("error sending message");
+                                }
+                                return false;
+                            }
+                            if (word.length > currentWord.length) {
+                                try {
+                                    m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go lower :arrow_down:")
+                                }
+                                catch (error) {
+                                    console.log("error sending message");
+                                }
+                                return false;
                             }
                         }
-                        return false;
+
+                        // return true if the user doesn't have to match length or if the word lengths are equal
+                        // this is better than just returning true since it will only show late users if they
+                        // correctly solved it instead of just finding a correct word for a prompt with a specific amount of characters
+                        return (!matchLength) || word.length == currentWord.length;
                     }
                 }
             }
@@ -303,5 +299,15 @@ module.exports = {
             return c;
         }
 
+        function binarySearchWord(word, low, high) {
+            if (words[Math.floor((low + high) / 2)] == word) { 
+                return true;
+            }
+            if (low == high) return false;
+            if (word > words[Math.floor((low + high) / 2)]) {
+                return binarySearchWord(word, Math.ceil((low + high) / 2), high);
+            }
+            return binarySearchWord(word, low, Math.floor((low + high) / 2));
+        }
     }
 }
