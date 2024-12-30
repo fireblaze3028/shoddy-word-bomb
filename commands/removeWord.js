@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { authorId } = require("../config.json");
-const { getWords, getTemplates, getTemplateSolves } = require('../utility/game-info');
+const { getWords, getTemplates, getTemplateSolves, binarySearchWord } = require('../utility/game-info');
 const fs = require('fs');
 
 
@@ -27,7 +27,7 @@ module.exports = {
             await interaction.editReply(`:red_square: "${newWord}" has non-alphanumeric characters.`);
             return;
         }
-        var index = binarySearchWord(newWord, 0, words.length);
+        var index = binarySearchWord(newWord, words, 0, words.length);
         if (words[index] != newWord) {
             await interaction.editReply(`:red_square: "${newWord}" is not in the dictionary.`);
             return;
@@ -44,14 +44,6 @@ module.exports = {
         }
 
         await interaction.editReply(`:green_square: "${newWord}" has been removed from the dictionary.`);
-
-        function binarySearchWord(word, low, high) {
-            if (low >= high) return low;
-            if (word > words[Math.floor((low + high) / 2)]) {
-                return binarySearchWord(word, Math.ceil((low + high) / 2), high);
-            }
-            return binarySearchWord(word, low, Math.floor((low + high) / 2));
-        }
 
         function getWordString() {
             var s = "";

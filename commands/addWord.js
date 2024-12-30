@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { authorId } = require("../config.json");
-const { getWords, getTemplates, getTemplateSolves } = require('../utility/game-info');
+const { getWords, getTemplates, getTemplateSolves, binarySearchWord } = require('../utility/game-info');
 const fs = require('fs');
 
 
@@ -33,7 +33,7 @@ module.exports = {
         }
 
         console.log(templateSolves[13].get("ary"));
-        words.splice(binarySearchWord(newWord, 0, words.length), 0, newWord);
+        words.splice(binarySearchWord(newWord, words, 0, words.length), 0, newWord);
         fs.writeFile("./files/dictionary.txt", getWordString(), err => {
             if (err) {
                 console.error(err);
@@ -45,14 +45,6 @@ module.exports = {
         }
         console.log(templateSolves[13].get("ary"));
         await interaction.editReply(`:green_square: "${newWord}" has been added to the dictionary.`);
-
-        function binarySearchWord(word, low, high) {
-            if (low >= high) return low;
-            if (word > words[Math.floor((low + high) / 2)]) {
-                return binarySearchWord(word, Math.ceil((low + high) / 2), high);
-            }
-            return binarySearchWord(word, low, Math.floor((low + high) / 2));
-        }
 
         function getWordString() {
             var s = "";

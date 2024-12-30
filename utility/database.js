@@ -1,27 +1,41 @@
 const fs = require('fs');
+const { binarySearchWord } = require("../utility/game-info.js");
 
 module.exports = {
-    updateUser(channelID, userID, exact, time, streak) {
+    updateUser(channelID, userID, exact, time, streak, word) {
+        var newWord = false;
         var channelStats = this.getChannel(channelID);
-        if (!channelStats.has(userID)) {
-            channelStats.set(userID, {solves: 0, exacts: 0, time: undefined, streak: 0});
+        if (!channelStats.userData.has(userID)) {
+            channelStats.userData.set(userID, {solves: 0, exacts: 0, time: undefined, streak: 0, uniques: 0});
         }
-        var userStats = channelStats.get(userID);
+        var userStats = channelStats.userData.get(userID);
         userStats.solves++;
         if (exact) { userStats.exacts++; }
         if (time < userStats.time || userStats.time == undefined) { userStats.time = time; }
         if (streak > userStats.streak) { userStats.streak = streak; }
 
+        const index = binarySearchWord(word, channelStats.wordsUsed, 0, channelStats.wordsUsed.length);
+        if (channelStats.wordsUsed[index] != word) {
+            newWord = true;
+            channelStats.wordsUsed.splice(index, 0, word);
+            // if old data still exists
+            if (!userStats.uniques) userStats.uniques = 0;
+            userStats.uniques++;
+        }
+
+        // convert back to array to write
+        channelStats.userData = Array.from(channelStats.userData.entries());
         try {
-            fs.writeFileSync('./stats/' + channelID + '.txt', JSON.stringify(Array.from(channelStats.entries())));
+            fs.writeFileSync('./stats/' + channelID + '.txt', JSON.stringify(channelStats));
         } catch (error) {
             let string = `${channelID}:\n${JSON.stringify(Array.from(channelStats.entries()))}`; // in case writing to file fails
             console.log(error);
             console.log(string);
         }
+        return newWord;
     },
     getUser(channelID, userID) {
-        var channelStats = this.getChannel(channelID);
+        var channelStats = this.getChannel(channelID).userData;
         if (!channelStats.has(userID)) {
             channelStats.set(userID, {solves: 0, exacts: 0, time: undefined, streak: 0});
         }
@@ -29,9 +43,16 @@ module.exports = {
     },
     getChannel(channelID) {
         if (!fs.existsSync('./stats/' + channelID + '.txt')) {
-            return new Map();
+            return { userData: new Map(), wordsUsed: [] }
         }
-        return new Map(JSON.parse(fs.readFileSync('./stats/' + channelID + '.txt')));
+        const data = JSON.parse(fs.readFileSync('./stats/' + channelID + '.txt'));
+        if (data.userData) {
+            // since userData is stored as a 2D array, we need to convert it back to a map
+            data.userData = new Map(data.userData);
+            return data;
+        }
+        // conversion from old data system to new
+        return { userData: new Map(data), wordsUsed: [] }
     },
     deleteChannel(channelID) {
         // we don't delete stats for channel

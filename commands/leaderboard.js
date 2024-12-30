@@ -13,7 +13,8 @@ module.exports = {
                 { name: 'Solutions', value: 'solves' },
                 { name: 'Exact Solutions', value: 'exacts' },
                 { name: 'Time Solved', value: 'time' },
-                { name: 'Solve Streak', value: 'streak' }
+                { name: 'Solve Streak', value: 'streak' },
+                { name: 'Unique Words', value: 'uniques'}
             )
         )
         .addBooleanOption(option => 
@@ -30,10 +31,12 @@ module.exports = {
             .set('solves', 'solves')
             .set('exacts', 'exacts')
             .set('time', 'ms')
-            .set('streak', 'solves');
+            .set('streak', 'solves')
+            .set('uniques', 'unique words');
 
             // get channel and see if there are people in the leaderboard
-            var channel = database.getChannel(database.getChannelFromServer(interaction.guild.id));
+            const data = database.getChannel(database.getChannelFromServer(interaction.guild.id));
+            var channel = data.userData;
             if (channel.size == 0) {
                 try {
                     interaction.reply({ embeds: [getErrorEmbed()], ephemeral: interaction.options.getBoolean("ephemeral") });
@@ -50,7 +53,7 @@ module.exports = {
 
             // sort our people
             channel.forEach((value, key, map) => {
-                sorted.push({ user: key, val: eval(`value.${sort}`) });
+                sorted.push({ user: key, val: (eval(`value.${sort}`) || 0) });
             })
 
             // sort our list
@@ -58,7 +61,8 @@ module.exports = {
             if (sort == 'time') { sorted.reverse() } // time should be in descending
             var embed = new EmbedBuilder()
                 .setTitle(`Leaderboard for ${interaction.guild.name} - ${sort}`)
-                .setColor(0x12d198);
+                .setColor(0x12d198)
+                .setFooter({ text: `Unique words used: ${data.wordsUsed.length}` });
             
             // create the string to send
             var content = '';
@@ -97,7 +101,7 @@ module.exports = {
                 return embed;
             }
         } catch (error) {
-            
+            console.log(error);
         }
     }
 }

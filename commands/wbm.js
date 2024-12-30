@@ -1,6 +1,7 @@
 const emoji = require("../utility/emoji.js");
 const database = require("../utility/database.js");
 const { PermissionFlagsBits } = require("discord.js");
+const { binarySearchWord } = require("../utility/game-info.js");
 
 
 module.exports = {
@@ -63,7 +64,6 @@ module.exports = {
             mContent[0] = "Solved by " + m.author.username + ", created from the word \"" + currentWord + "\"";
 
             if (checkPrompt(m.content.trim().toLowerCase(), m)) {
-                console.log(templateSolves[13].get("ary"));
                 timeSolved = m.createdTimestamp;
                 solveOwners.push(m.author.id);
                 //console.log(timeSolved - timeSent);
@@ -73,7 +73,9 @@ module.exports = {
                 if (!solveUsers.includes(m.author.id)) {
                     var exact = checkExact(m);
                     updateStreak(m);
-                    database.updateUser(channel.id, streakOwner.id, exact, timeSolved - timeSent, currentStreak);
+                    if (database.updateUser(channel.id, streakOwner.id, exact, timeSolved - timeSent, currentStreak, m.content.trim().toLowerCase())) {
+                        mContent[6] = `\n\nThat's the **first** time "${m.content.trim().toLowerCase()}" has been used in a solve!`;
+                    };
                 }
                 else {
                     mContent[4] = `\n**${m.author.username}** used the solver this round.`;
@@ -225,7 +227,7 @@ module.exports = {
                     }
         
                     if (j == currentPrompt.length - 1) {
-                        if (!binarySearchWord(word, 0, words.length)) return false;
+                        if (words[binarySearchWord(word, words, 0, words.length)] != word) return false;
                         // if the length has to match
                         if (matchLength && solveOwners.length == 0) {
                             if (word.length < currentWord.length) {
@@ -297,17 +299,6 @@ module.exports = {
                 c += x;
             }
             return c;
-        }
-
-        function binarySearchWord(word, low, high) {
-            if (words[Math.floor((low + high) / 2)] == word) { 
-                return true;
-            }
-            if (low == high) return false;
-            if (word > words[Math.floor((low + high) / 2)]) {
-                return binarySearchWord(word, Math.ceil((low + high) / 2), high);
-            }
-            return binarySearchWord(word, low, Math.floor((low + high) / 2));
         }
     }
 }

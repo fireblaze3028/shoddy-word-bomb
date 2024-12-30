@@ -50,4 +50,11 @@ module.exports = {
         }
         return templateSolves;
     },
+    binarySearchWord(word, words, low, high) {
+        if (low >= high) return low;
+        if (word > words[Math.floor((low + high) / 2)]) {
+            return module.exports.binarySearchWord(word, words, Math.ceil((low + high) / 2), high);
+        }
+        return module.exports.binarySearchWord(word, words, low, Math.floor((low + high) / 2));
+    }
 }
