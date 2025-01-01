@@ -16,6 +16,9 @@ module.exports = {
 
         // current word that we are using
         var currentWord;
+        // current letter we use to find prompts with letter requirements
+        var currentLetter;
+        var currentLetterCount;
         // current prompt
         var currentPrompt = "";
         // current message object
@@ -28,6 +31,7 @@ module.exports = {
 
         // to see if we have to match length or not
         var matchLength = true;
+        var matchLetter = true;
 
         // if the prompt mode is hard mode
         var hardMode = false;
@@ -133,19 +137,28 @@ module.exports = {
         })
 
         function mainGameLoop() {
-            matchLength = true;
             createPrompt();
-            var solutionsCount = solves();
-            if (solutionsCount < 150) {
-                matchLength = false;
+            var i = 3;
+            // this while loop tries all possibilites while trying to keep solutionsCount greater than 150:
+            // matching length and matching letter count
+            // matching letter count
+            // matching length
+            var solutionsCount = 0;
+            while (solutionsCount < 150 && (matchLength || matchLetter)) {
+                matchLength = (i & 2) > 0;
+                matchLetter = (i & 1) > 0;
+                i--;
                 solutionsCount = solves();
             }
-            mainm = "Type a word containing: " + emoji.promptToEmoji(currentPrompt) + " (" + solves() + " solutions)";
+            mainm = "Type a word containing: " + emoji.promptToEmoji(currentPrompt) + " (" + solves() + " solutions)\n";
             if (matchLength) {
-                mainm += "\n\nMust be " + (currentWord.length) + " characters long!";
+                mainm += "\nMust be **" + (currentWord.length) + "** characters long!";
+            }
+            if (matchLetter) {
+                mainm += `\nMust contain **${currentLetterCount}** ${currentLetter}'s!`;
             }
             try {
-                channel.send(mainm).then((message) => {
+                channel.send(mainm.trim()).then((message) => {
                     timeSent = message.createdTimestamp;
             })
             }
@@ -200,20 +213,54 @@ module.exports = {
                     currentPrompt += '-';
                 }
             }
-        
+
+            // get random letter to use
+            const letters = ["e", "s", "i", "a", "r"];
+            
+            
+            currentLetter = letters[Math.floor(Math.random() * letters.length)];
+
+            currentLetterCount = 0;
+
+            for (var c of currentWord) {
+                currentLetterCount += (c == currentLetter) ? 1 : 0;
+            }
         }
 
         function solves() {
-            if (matchLength) {
-                return templateSolves[currentWord.length].get(currentPrompt);
-            }
             var count = 0;
-            for (var i = 0; i < templateSolves.length; i++) {
-                if (templateSolves[i] == undefined || templateSolves[i].get(currentPrompt) == undefined) {
-                    continue;
+            var letterCount;
+            if (matchLetter && matchLength) {
+                for (const word of templateSolves.get(currentPrompt).get(currentWord.length)) {
+                    letterCount = 0;
+                    for (const c of word) {
+                        letterCount += (c == currentLetter) ? 1 : 0;
+                    } 
+
+                    count += (letterCount == currentLetterCount) ? 1 : 0;
                 }
-                count += templateSolves[i].get(currentPrompt);
             }
+            else if (!matchLetter && matchLength) {
+                count = templateSolves.get(currentPrompt).get(currentWord.length).length;
+            }
+            else if (matchLetter && !matchLength) {
+                for (const c of templateSolves.get(currentPrompt)) {
+                    for (const word of c[1]) {
+                        letterCount = 0;
+                        for (const ch of word) {
+                            letterCount += (ch == currentLetter) ? 1 : 0;
+                        } 
+    
+                        count += (letterCount == currentLetterCount) ? 1 : 0;
+                    }
+                }
+            }
+            else if (!matchLength && !matchLetter) {
+                for (const c of templateSolves.get(currentPrompt)) {
+                    count += c[1].length;
+                }
+            }
+
             return count;
         }
 
@@ -250,10 +297,36 @@ module.exports = {
                             }
                         }
 
+                        var letterCount = 0;
+                        for (var c of word) {
+                            letterCount += (c == currentLetter) ? 1 : 0;
+                        }
+
+                        if (matchLetter && solveOwners.length == 0) {
+                            if (letterCount < currentLetterCount) {
+                                try {
+                                    m.reply("Your word must contain " + (currentLetterCount) + " " + currentLetter + "'s!\nYour word has **" + letterCount + "** " + currentLetter + "'s, go higher :arrow_up:")
+                                }
+                                catch (error) {
+                                    console.log("error sending message");
+                                }
+                                return false;
+                            }
+                            if (letterCount > currentLetterCount) {
+                                try {
+                                    m.reply("Your word must contain " + (currentLetterCount) + " " + currentLetter + "'s!\nYour word has **" + letterCount + "** " + currentLetter + "'s, go lower :arrow_down:")
+                                }
+                                catch (error) {
+                                    console.log("error sending message");
+                                }
+                                return false;
+                            }
+                        }
+
                         // return true if the user doesn't have to match length or if the word lengths are equal
                         // this is better than just returning true since it will only show late users if they
                         // correctly solved it instead of just finding a correct word for a prompt with a specific amount of characters
-                        return (!matchLength) || word.length == currentWord.length;
+                        return ((!matchLength) || word.length == currentWord.length) && ((!matchLetter) || letterCount == currentLetterCount);
                     }
                 }
             }

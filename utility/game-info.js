@@ -8,7 +8,7 @@ module.exports = {
         return fs.readFileSync('./files/templates.txt').toString().split("\n");
     },
     getTemplateSolves(templates, words) {
-        const templateSolves = new Array();
+        const templateSolves = new Map();
         for (var i = 0; i < templates.length; i++) {
             // every solve for this specific template
         
@@ -17,6 +17,12 @@ module.exports = {
                 var solvesDone = new Array();
                 if (words[j].length < templates[i].length) {
                     continue;
+                }
+                // count the number of occurrences of letters of the word
+                const letterCount = new Map();
+                for (var c of words[j]) {
+                    if (!letterCount.has(c)) letterCount.set(c, 0);
+                    letterCount.set(c, letterCount.get(c) + 1);
                 }
                 // for every position that the template can fit into the word
                 for (var k = 0; k <= words[j].length - templates[i].length; k++) {
@@ -35,15 +41,13 @@ module.exports = {
                     if (!solvesDone.includes(currentPrompt)) {
                         solvesDone[solvesDone.length] = currentPrompt;
         
-                        if (templateSolves[words[j].length] == undefined) {
-                            templateSolves[words[j].length] = new Map();
+                        if (templateSolves.get(currentPrompt) === undefined) {
+                            templateSolves.set(currentPrompt, new Map());
                         }
-                        if (templateSolves[words[j].length].get(currentPrompt)== undefined) {
-                            templateSolves[words[j].length].set(currentPrompt, 1);
+                        if (templateSolves.get(currentPrompt).get(words[j].length) === undefined) {
+                            templateSolves.get(currentPrompt).set(words[j].length, new Array());
                         }
-                        else {
-                            templateSolves[words[j].length].set(currentPrompt, templateSolves[words[j].length].get(currentPrompt) + 1);
-                        }
+                        templateSolves.get(currentPrompt).get(words[j].length).push(words[j]);
                     }
                 }
             }
