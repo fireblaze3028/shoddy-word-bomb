@@ -27,12 +27,11 @@ module.exports = {
             await interaction.editReply(`:red_square: "${newWord}" has non-alphanumeric characters.`);
             return;
         }
-        if (words[binarySearchWord(newWord, 0, words.length)] == newWord) {
+        if (words[binarySearchWord(newWord, words, 0, words.length)] == newWord) {
             await interaction.editReply(`:red_square: "${newWord}" is already in the dictionary.`);
             return;
         }
 
-        console.log(templateSolves[13].get("ary"));
         words.splice(binarySearchWord(newWord, words, 0, words.length), 0, newWord);
         fs.writeFile("./files/dictionary.txt", getWordString(), err => {
             if (err) {
@@ -43,7 +42,6 @@ module.exports = {
         for (var i = 0; i < templateSolvesCopy.length; i++) {
             templateSolves[i] = templateSolvesCopy[i];
         }
-        console.log(templateSolves[13].get("ary"));
         await interaction.editReply(`:green_square: "${newWord}" has been added to the dictionary.`);
 
         function getWordString() {

@@ -137,7 +137,10 @@ module.exports = {
         })
 
         function mainGameLoop() {
+            const time = performance.now();
             createPrompt();
+            const afterTime = performance.now();
+            console.log(`Prompt took ${afterTime - time}ms to create`);
             var i = 3;
             // this while loop tries all possibilites while trying to keep solutionsCount greater than 150:
             // matching length and matching letter count
@@ -150,17 +153,17 @@ module.exports = {
                 i--;
                 solutionsCount = solves();
             }
-            mainm = "Type a word containing: " + emoji.promptToEmoji(currentPrompt) + " (" + solves() + " solutions)\n";
+            mainm = "Type a word containing: " + emoji.promptToEmoji(currentPrompt) + "  (" + solves() + " solutions)\n";
             if (matchLength) {
-                mainm += "\nMust be **" + (currentWord.length) + "** characters long!";
+                mainm += "\nMust be **" + (emoji.numberToEmoji(currentWord.length)) + "** characters long!";
             }
             if (matchLetter) {
-                mainm += `\nMust contain **${currentLetterCount}** ${currentLetter}'s!`;
+                mainm += `\nMust contain **${currentLetterCount} ${emoji.promptToEmoji(currentLetter)}**` + ((currentLetterCount == 1) ? "!" : `s!`);
             }
             try {
-                channel.send(mainm.trim()).then((message) => {
+                channel.send(mainm.trim()).then((message) => {  
                     timeSent = message.createdTimestamp;
-            })
+                })
             }
             catch (error) {
                 console.log("error sending message");
@@ -214,10 +217,28 @@ module.exports = {
                 }
             }
 
+            // we have two methods to get the letter constraint:
+            // picking a random letter that the word has (to get some random letters)
+            // and picking from the 5 most common letters in english (to possibly have a constraint with 0 letters)
+            const letterMethod = Math.floor(Math.random() * 2);
+
+            if (letterMethod) {
+                const letters = new Map();
+                for (var c of currentWord) {
+                    if (!letters.has(c)) letters.set(c, 0);
+                    letters.set(c, letters.get(c) + 1);
+                }
+                const lettersArray = Array.from(letters);
+
+                currentLetter = lettersArray[Math.floor(Math.random() * lettersArray.length)];
+                currentLetterCount = currentLetter[1];
+                currentLetter = currentLetter[0];
+                return;
+            }
+            
+
             // get random letter to use
             const letters = ["e", "s", "i", "a", "r"];
-            
-            
             currentLetter = letters[Math.floor(Math.random() * letters.length)];
 
             currentLetterCount = 0;
@@ -279,19 +300,19 @@ module.exports = {
                         if (matchLength && solveOwners.length == 0) {
                             if (word.length < currentWord.length) {
                                 try {
-                                    m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go higher :arrow_up:")
+                                    m.reply("Your word must be " + emoji.numberToEmoji(currentWord.length) + " characters long!\nYour word has **" + emoji.numberToEmoji(word.length) + "** characters, go higher :arrow_up:")
                                 }
                                 catch (error) {
-                                    console.log("error sending message");
+                                    console.log(error);
                                 }
                                 return false;
                             }
                             if (word.length > currentWord.length) {
                                 try {
-                                    m.reply("Your word must be " + (currentWord.length) + " characters long!\nYour word has **" + word.length + "** characters, go lower :arrow_down:")
+                                    m.reply("Your word must be " + emoji.numberToEmoji(currentWord.length) + " characters long!\nYour word has **" + emoji.numberToEmoji(word.length) + "** characters, go lower :arrow_down:")
                                 }
                                 catch (error) {
-                                    console.log("error sending message");
+                                    console.log(error);
                                 }
                                 return false;
                             }
@@ -305,19 +326,19 @@ module.exports = {
                         if (matchLetter && solveOwners.length == 0) {
                             if (letterCount < currentLetterCount) {
                                 try {
-                                    m.reply("Your word must contain " + (currentLetterCount) + " " + currentLetter + "'s!\nYour word has **" + letterCount + "** " + currentLetter + "'s, go higher :arrow_up:")
+                                    m.reply("Your word must contain " + (currentLetterCount) + " " + emoji.promptToEmoji(currentLetter) + ((currentLetterCount == 1) ? "" : "s") + "!\nYour word has **" + (letterCount) + "** " + emoji.promptToEmoji(currentLetter) + ((letterCount == 1) ? "" : "s") + ", go higher :arrow_up:")
                                 }
                                 catch (error) {
-                                    console.log("error sending message");
+                                    console.log(error);
                                 }
                                 return false;
                             }
                             if (letterCount > currentLetterCount) {
                                 try {
-                                    m.reply("Your word must contain " + (currentLetterCount) + " " + currentLetter + "'s!\nYour word has **" + letterCount + "** " + currentLetter + "'s, go lower :arrow_down:")
+                                    m.reply("Your word must contain " + (currentLetterCount) + " " + emoji.promptToEmoji(currentLetter) + ((currentLetterCount == 1) ? "" : "s") + "!\nYour word has **" + (letterCount) + "** " + emoji.promptToEmoji(currentLetter) + ((letterCount == 1) ? "" : "s") + ", go lower :arrow_down:")
                                 }
                                 catch (error) {
-                                    console.log("error sending message");
+                                    console.log(error);
                                 }
                                 return false;
                             }

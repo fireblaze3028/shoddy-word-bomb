@@ -17,7 +17,7 @@ module.exports = {
             }
         }
     
-        return finalString;
+        return finalString.trimEnd();
     },
     
     numberToEmoji(num) {
