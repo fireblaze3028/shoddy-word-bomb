@@ -29,7 +29,6 @@ const templateSolves = getTemplateSolves(templates, words);
 
 // our channels that we are gonna use
 var channels = fs.readFileSync('./files/channels.txt').toString().split("\n");
-channels.pop();
 for (var i = 0; i < channels.length; i++) {
     channels[i] = channels[i].split(",")[0];
 }
