@@ -20,17 +20,16 @@ const client = new Client({
 
 // create our words variable to hold all words
 const words = getWords();
-//words.forEach(stripEnd);
 
 // read our dictionary to our variable
 
 const templates = getTemplates();
-//templates.forEach(stripEnd);
+templates.pop();
 const templateSolves = getTemplateSolves(templates, words);
 
 // our channels that we are gonna use
 var channels = fs.readFileSync('./files/channels.txt').toString().split("\n");
-channels.forEach(stripEnd);
+channels.pop();
 for (var i = 0; i < channels.length; i++) {
     channels[i] = channels[i].split(",")[0];
 }
@@ -97,6 +96,7 @@ client.once('ready', client => {
     for (var channelID of channels) {
         if (channelID.startsWith("//")) continue; // dont start commented out channels
         var channel = client.channels.cache.get(channelID);
+	if (!channel) return;
         wbm.execute(client, channel, words, templates, templateSolves);
     }
 })

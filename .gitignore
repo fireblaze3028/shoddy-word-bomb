@@ -1,4 +1,5 @@
 config.json
 files/channels.txt
 stats/*
+node_modules
 !stats/exampleChannelID.txt
