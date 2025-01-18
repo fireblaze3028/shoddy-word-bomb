@@ -141,15 +141,16 @@ module.exports = {
             createPrompt();
             const afterTime = performance.now();
             console.log(`Prompt took ${afterTime - time}ms to create`);
-            var i = 3;
+            var i = hardMode ? 3 : 2;
+            var bias = Math.random() > 0.5; // add bias to favour to match length or letter randomly
             // this while loop tries all possibilites while trying to keep solutionsCount greater than 150:
-            // matching length and matching letter count
+            // matching length and matching letter count (hard mode only)
             // matching letter count
             // matching length
             var solutionsCount = 0;
-            while (solutionsCount < 150 && (matchLength || matchLetter)) {
-                matchLength = (i & 2) > 0;
-                matchLetter = (i & 1) > 0;
+            while (solutionsCount < (hardMode ? 150 : 500) && (matchLength || matchLetter)) {
+                matchLength = (i & (1 + bias)) > 0;
+                matchLetter = (i & (2 - bias)) > 0;
                 i--;
                 solutionsCount = solves();
             }
@@ -187,25 +188,6 @@ module.exports = {
         
             var place = Math.floor(Math.random() * upperBound);
         
-            if (hardMode) {
-                var lowestSolves = 99999; // very bad code
-                for (var i = 0; i < upperBound; i++) {
-                    currentPrompt = "";
-                    for (var j = i; j < i + currentTemplate.length; j++) {
-                        if (currentTemplate.charAt(j - i) == '.') {
-                            currentPrompt += currentWord.charAt(j);
-                        }
-                        else {
-                            currentPrompt += '-';
-                        }
-                    }
-                    currentSolves = solves();
-                    if (lowestSolves > currentSolves) {
-                        lowestSolves = currentSolves;
-                        place = i;
-                    }
-                }
-            }
             matchLength = true;
             currentPrompt = "";
             for (var i = place; i < place + currentTemplate.length; i++) {
