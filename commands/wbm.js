@@ -187,6 +187,26 @@ module.exports = {
             var upperBound = currentWord.length - currentTemplate.length;
         
             var place = Math.floor(Math.random() * upperBound);
+
+            if (hardMode) {
+                var lowestSolves = 99999; // very bad code
+                for (var i = 0; i < upperBound; i++) {
+                    currentPrompt = "";
+                    for (var j = i; j < i + currentTemplate.length; j++) {
+                        if (currentTemplate.charAt(j - i) == '.') {
+                            currentPrompt += currentWord.charAt(j);
+                        }
+                        else {
+                            currentPrompt += '-';
+                        }
+                    }
+                    currentSolves = solves();
+                    if (lowestSolves > currentSolves) {
+                        lowestSolves = currentSolves;
+                        place = i;
+                    }
+                }
+            }
         
             matchLength = true;
             currentPrompt = "";
