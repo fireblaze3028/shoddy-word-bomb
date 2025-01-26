@@ -96,7 +96,11 @@ module.exports = {
                 // set our timeout so no one else can solve this prompt
                 setTimeout(() => {
                     if (solveOwners.length > 1) {
-                        currentMessage.edit(stitchMessage(mContent.flat()))
+                        try {
+                            currentMessage.edit(stitchMessage(mContent.flat()))
+                        } catch (error) {
+                            console.error(error);
+                        }
                     }
                 }, 1000);
                 // start the loop again after three seconds
