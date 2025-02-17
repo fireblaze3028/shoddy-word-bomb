@@ -80,10 +80,28 @@ client.on('interactionCreate', async interaction => {
 
     try {
         if (command.needsWordData) {
-            await command.execute(interaction, client, words, templates, templateSolves);
+            try {
+                await command.execute(interaction, client, words, templates, templateSolves);
+            } catch (e) {
+                console.log(e);
+                try {
+                    client.users.fetch(authorId, false).then((user) => {
+                        user.send("```\n" + e + "\n```");
+                    })
+                } catch (e2) {}
+            }
         }
         else {
-            await command.execute(interaction, client);
+            try {
+                await command.execute(interaction, client);
+            } catch (e) {
+                console.log(e);
+                try {
+                    client.users.fetch(authorId, false).then((user) => {
+                        user.send("```\n" + e + "\n```");
+                    })
+                } catch (e2) {}
+            }
         }
     }
     catch (error) {

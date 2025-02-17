@@ -16,50 +16,46 @@ module.exports = {
         .setDMPermission(false),
     
     async execute(interaction, client) {
-        try {
-            // get the stats of the target user
-            var user = interaction.user;
-            if (interaction.options.getUser('target')) {
-                user = interaction.options.getUser('target');
-            }
-            var content = database.getUser(database.getChannelFromServer(interaction.guild.id), user.id);
+        // get the stats of the target user
+        var user = interaction.user;
+        if (interaction.options.getUser('target')) {
+            user = interaction.options.getUser('target');
+        }
+        var content = database.getUser(database.getChannelFromServer(interaction.guild.id), user.id);
 
-            // checking if time is undefined, then no solves have occured
-            if (content.time == undefined) {
-                try {
-                    await interaction.reply({ embeds: [getErrorEmbed()], ephemeral: interaction.options.getBoolean('ephemeral') })
-                }
-                catch (error) {
-                    console.log("error sending message");
-                }
-                return;
+        // checking if time is undefined, then no solves have occured
+        if (content.time == undefined) {
+            try {
+                await interaction.reply({ embeds: [getErrorEmbed()], ephemeral: interaction.options.getBoolean('ephemeral') })
             }
+            catch (error) {
+                console.log("error sending message");
+            }
+            return;
+        }
 
-            // create our embed with stats
+        // create our embed with stats
+        const embed = new EmbedBuilder()
+        .setTitle(`Stats for ${user.username}`)
+        .setColor(0x12d198)
+        .addFields(
+        { name: `Solves: `, value: `${content.solves}` },
+        { name: `Exact solves: `, value: `${content.exacts}` },
+        { name: `Fastest time to solve: `, value: `${content.time} ms` },
+        { name: `Largest streak: `, value: `${content.streak}` });
+
+        // reply with just the embed and the option for the message to be ephemeral
+        await interaction.reply({embeds: [embed], ephemeral: interaction.options.getBoolean('ephemeral')})
+
+        // create and return our error embed
+        function getErrorEmbed() {
             const embed = new EmbedBuilder()
-            .setTitle(`Stats for ${user.username}`)
-            .setColor(0x12d198)
+            .setTitle(`Error`)
+            .setColor(0xFF0000)
             .addFields(
-            { name: `Solves: `, value: `${content.solves}` },
-            { name: `Exact solves: `, value: `${content.exacts}` },
-            { name: `Fastest time to solve: `, value: `${content.time} ms` },
-            { name: `Largest streak: `, value: `${content.streak}` });
-
-            // reply with just the embed and the option for the message to be ephemeral
-            await interaction.reply({embeds: [embed], ephemeral: interaction.options.getBoolean('ephemeral')})
-
-            // create and return our error embed
-            function getErrorEmbed() {
-                const embed = new EmbedBuilder()
-                .setTitle(`Error`)
-                .setColor(0xFF0000)
-                .addFields(
-                    { name: `You haven't played yet!`, value: `Solve a prompt in order to get your stats.` }
-                );
-                return embed;
-            }
-        } catch (error) {
-            console.log(error);
+                { name: `You haven't played yet!`, value: `Solve a prompt in order to get your stats.` }
+            );
+            return embed;
         }
     }
 }

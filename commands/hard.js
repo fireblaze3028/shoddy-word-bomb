@@ -11,20 +11,10 @@ module.exports = {
         // then call the instance of the game to toggle hard mode
         var correctChannel = database.getChannelFromServer(interaction.guild.id);
         if (correctChannel == undefined) {
-            try {
-                interaction.reply({ content: "You must set the channel to enable this.", ephemeral: true })
-            }
-            catch (error) {
-                console.log("error sending message");
-            }
+            interaction.reply({ content: "You must set the channel to enable this.", ephemeral: true })
         }
         else if (correctChannel != interaction.channel.id) {
-            try {
-                interaction.reply({ content: "Please use this command in the channel that is being played in.", ephemeral: true})
-            }
-            catch (error) {
-                console.log("error sending message");
-            }
+            interaction.reply({ content: "Please use this command in the channel that is being played in.", ephemeral: true})
         }
         else {
             client.emit(`${correctChannel}-hard`, interaction);

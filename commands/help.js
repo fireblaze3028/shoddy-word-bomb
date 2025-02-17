@@ -21,11 +21,6 @@ module.exports = {
         }
         embed.setDescription(content);
 
-        try {
-            interaction.reply({ embeds: [embed] })
-        }
-        catch (error) {
-            console.log("error sending message");
-        }
+        interaction.reply({ embeds: [embed] })
     }
 }

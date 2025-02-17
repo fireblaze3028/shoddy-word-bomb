@@ -36,6 +36,7 @@ module.exports = {
 
             // get channel and see if there are people in the leaderboard
             const data = database.getChannel(database.getChannelFromServer(interaction.guild.id));
+            var found = false;
             var channel = data.userData;
             if (channel.size == 0) {
                 try {
@@ -81,11 +82,25 @@ module.exports = {
                 var curr = sorted.shift();
                 content += `<@${curr.user}>: ${curr.val} ${suffixes.get(sort)}\n\n`;
             }
-            for (var i = 4; (i < 10) && sorted.length != 0; i++) {
+            for (var i = 4; (i <= 10) && sorted.length != 0; i++) {
                 var curr = sorted.shift();
-                content += `${i}: <@${curr.user}>: ${curr.val} ${suffixes.get(sort)}\n`;
+                if (curr.user == interaction.user.id) {
+                    found = true;
+                    content += `**${i}**: <@${curr.user}>: ${curr.val} ${suffixes.get(sort)}\n`;
+                }
+                else {
+                    content += `${i}: <@${curr.user}>: ${curr.val} ${suffixes.get(sort)}\n`;
+                }
             }
             // maybe limit lb to 10 users and show user place if they are past 10th place
+            for (var i = 11; sorted.length != 0 && (!found); i++) {
+                var curr = sorted.shift();
+                if (curr.user == interaction.user.id) {
+                    found = true;
+                    content += `\n**${i}**: <@${curr.user}>: ${curr.val} ${suffixes.get(sort)}\n`;
+                }
+            }
+            
 
             embed.setDescription(content);
 

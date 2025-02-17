@@ -83,24 +83,19 @@ module.exports = {
                 }
                 else {
                     mContent[4] = `\n**${m.author.username}** used the solver this round.`;
+                    if (streakOwner === m.author.id) {
+                        streakOwner = null;
+                        currentStreak = 0;
+                    }
                 }
 
-                try {
-                    m.reply(stitchMessage(mContent.flat())).then((message) => {
-                        currentMessage = message;
-                    })
-                }
-                catch (error) {
-                    console.log("error sending message");
-                }
+                m.reply(stitchMessage(mContent.flat())).then((message) => {
+                    currentMessage = message;
+                })
                 // set our timeout so no one else can solve this prompt
                 setTimeout(() => {
                     if (solveOwners.length > 1) {
-                        try {
-                            currentMessage.edit(stitchMessage(mContent.flat()))
-                        } catch (error) {
-                            console.error(error);
-                        }
+                        currentMessage.edit(stitchMessage(mContent.flat()))
                     }
                 }, 1000);
                 // start the loop again after three seconds
@@ -118,12 +113,7 @@ module.exports = {
         // toggle hard mode once given signal
         client.on(`${channel.id}-hard`, (i) => {
             hardMode = !hardMode;
-            try {
-                i.reply(`Hard mode ${hardMode ? "enabled in this channel." : "disabled in this channel."}`)
-            }
-            catch (error) {
-                console.log("error sending message");
-            }
+            i.reply(`Hard mode ${hardMode ? "enabled in this channel." : "disabled in this channel."}`)
         });
 
         // add people who use /solve to a list
@@ -133,11 +123,7 @@ module.exports = {
 
         //resend prompt when given signal
         client.on(`${channel.id}-prompt`, (i) => {
-            try {
-                i.reply(mainm);
-            } catch (error) {
-                console.log("error sending message");
-            }
+            i.reply(mainm);
         })
 
         function mainGameLoop() {
@@ -165,14 +151,9 @@ module.exports = {
             if (matchLetter) {
                 mainm += `\nMust contain **${currentLetterCount} ${emoji.promptToEmoji(currentLetter)}**` + ((currentLetterCount == 1) ? "!" : `s!`);
             }
-            try {
-                channel.send(mainm.trim()).then((message) => {  
-                    timeSent = message.createdTimestamp;
-                })
-            }
-            catch (error) {
-                console.log("error sending message");
-            }
+            channel.send(mainm.trim()).then((message) => {  
+                timeSent = message.createdTimestamp;
+            })
         }
 
         function createPrompt() {
@@ -305,21 +286,11 @@ module.exports = {
                         // if the length has to match
                         if (matchLength && solveOwners.length == 0) {
                             if (word.length < currentWord.length) {
-                                try {
-                                    m.reply("Your word must be " + emoji.numberToEmoji(currentWord.length) + " characters long!\nYour word has **" + emoji.numberToEmoji(word.length) + "** characters, go higher :arrow_up:")
-                                }
-                                catch (error) {
-                                    console.log(error);
-                                }
+                                m.reply("Your word must be " + emoji.numberToEmoji(currentWord.length) + " characters long!\nYour word has **" + emoji.numberToEmoji(word.length) + "** characters, go higher :arrow_up:")
                                 return false;
                             }
                             if (word.length > currentWord.length) {
-                                try {
-                                    m.reply("Your word must be " + emoji.numberToEmoji(currentWord.length) + " characters long!\nYour word has **" + emoji.numberToEmoji(word.length) + "** characters, go lower :arrow_down:")
-                                }
-                                catch (error) {
-                                    console.log(error);
-                                }
+                                m.reply("Your word must be " + emoji.numberToEmoji(currentWord.length) + " characters long!\nYour word has **" + emoji.numberToEmoji(word.length) + "** characters, go lower :arrow_down:")
                                 return false;
                             }
                         }
@@ -331,21 +302,11 @@ module.exports = {
 
                         if (matchLetter && solveOwners.length == 0) {
                             if (letterCount < currentLetterCount) {
-                                try {
-                                    m.reply("Your word must contain " + (currentLetterCount) + " " + emoji.promptToEmoji(currentLetter) + ((currentLetterCount == 1) ? "" : "s") + "!\nYour word has **" + (letterCount) + "** " + emoji.promptToEmoji(currentLetter) + ((letterCount == 1) ? "" : "s") + ", go higher :arrow_up:")
-                                }
-                                catch (error) {
-                                    console.log(error);
-                                }
+                                m.reply("Your word must contain " + (currentLetterCount) + " " + emoji.promptToEmoji(currentLetter) + ((currentLetterCount == 1) ? "" : "s") + "!\nYour word has **" + (letterCount) + "** " + emoji.promptToEmoji(currentLetter) + ((letterCount == 1) ? "" : "s") + ", go higher :arrow_up:")
                                 return false;
                             }
                             if (letterCount > currentLetterCount) {
-                                try {
-                                    m.reply("Your word must contain " + (currentLetterCount) + " " + emoji.promptToEmoji(currentLetter) + ((currentLetterCount == 1) ? "" : "s") + "!\nYour word has **" + (letterCount) + "** " + emoji.promptToEmoji(currentLetter) + ((letterCount == 1) ? "" : "s") + ", go lower :arrow_down:")
-                                }
-                                catch (error) {
-                                    console.log(error);
-                                }
+                                m.reply("Your word must contain " + (currentLetterCount) + " " + emoji.promptToEmoji(currentLetter) + ((currentLetterCount == 1) ? "" : "s") + "!\nYour word has **" + (letterCount) + "** " + emoji.promptToEmoji(currentLetter) + ((letterCount == 1) ? "" : "s") + ", go lower :arrow_down:")
                                 return false;
                             }
                         }

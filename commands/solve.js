@@ -69,12 +69,7 @@ module.exports = {
         }
         catch (e) {
             console.log(e);
-            try {
-                interaction.reply({ content: "Your regex gave an error. Please try again.", ephemeral: ephemeral})
-            }
-            catch (error) {
-                console.log("error sending message");
-            }
+            interaction.reply({ content: "Your regex gave an error. Please try again.", ephemeral: ephemeral})
         }
     }
 }
