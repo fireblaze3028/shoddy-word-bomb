@@ -83,7 +83,7 @@ module.exports = {
                 }
                 else {
                     mContent[4] = `\n**${m.author.username}** used the solver this round.`;
-                    if (streakOwner === m.author.id) {
+                    if (streakOwner.id === m.author.id) {
                         streakOwner = null;
                         currentStreak = 0;
                     }
@@ -127,10 +127,7 @@ module.exports = {
         })
 
         function mainGameLoop() {
-            const time = performance.now();
             createPrompt();
-            const afterTime = performance.now();
-            console.log(`Prompt took ${afterTime - time}ms to create`);
             var i = hardMode ? 3 : 2;
             var bias = Math.random() > 0.5; // add bias to favour to match length or letter randomly
             // this while loop tries all possibilites while trying to keep solutionsCount greater than 150:

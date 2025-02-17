@@ -93,7 +93,7 @@ module.exports = {
                 }
             }
             // maybe limit lb to 10 users and show user place if they are past 10th place
-            for (var i = 11; sorted.length != 0 && (!found); i++) {
+            for (var i = 11; (sorted.length != 0) && (!found); i++) {
                 var curr = sorted.shift();
                 if (curr.user == interaction.user.id) {
                     found = true;
